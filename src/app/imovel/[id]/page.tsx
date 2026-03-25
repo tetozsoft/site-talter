@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
-import { fetchPropertyDetailServer, fetchConfigServer } from "@/lib/cdn";
+import { fetchPropertyDetailServer, fetchConfigServer, fetchAllPropertySlugs } from "@/lib/cdn";
 import { formatCurrency } from "@/lib/utils";
 import { PropertyDetailsClient } from "./PropertyDetailsClient";
 
-export const runtime = 'edge';
+export const revalidate = 600;
+
+export async function generateStaticParams() {
+  try {
+    const slugs = await fetchAllPropertySlugs();
+    return slugs.map((slug) => ({ id: slug }));
+  } catch {
+    return [];
+  }
+}
 
 interface PageProps {
   params: Promise<{ id: string }>;
