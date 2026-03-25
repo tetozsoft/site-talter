@@ -3,15 +3,18 @@ import { fetchPropertyDetailServer, fetchConfigServer, fetchAllPropertySlugs } f
 import { formatCurrency } from "@/lib/utils";
 import { PropertyDetailsClient } from "./PropertyDetailsClient";
 
-export const revalidate = 600;
+export const dynamicParams = false;
 
 export async function generateStaticParams() {
   try {
     const slugs = await fetchAllPropertySlugs();
-    return slugs.map((slug) => ({ id: slug }));
+    if (slugs.length > 0) return slugs.map((slug) => ({ id: slug }));
   } catch {
-    return [];
+    // CDN unavailable at build time
   }
+  // Next.js 16 Turbopack bug: returning [] crashes with "missing generateStaticParams".
+  // Return a placeholder so the build succeeds even when there are no properties yet.
+  return [{ id: "_" }];
 }
 
 interface PageProps {
