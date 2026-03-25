@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { fetchPropertyDetailServer, fetchConfigServer, fetchAllPropertySlugs } from "@/lib/cdn";
+import { fetchPropertyDetailServer, fetchConfigServer } from "@/lib/cdn";
 import { formatCurrency } from "@/lib/utils";
 import { PropertyDetailsClient } from "./PropertyDetailsClient";
 
 export const runtime = 'edge';
-export const revalidate = 600; // ISR: revalidate every 10 minutes
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -45,15 +44,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: "Imóvel não encontrado",
     };
-  }
-}
-
-export async function generateStaticParams() {
-  try {
-    const slugs = await fetchAllPropertySlugs();
-    return slugs.map((slug) => ({ id: slug }));
-  } catch {
-    return [];
   }
 }
 
